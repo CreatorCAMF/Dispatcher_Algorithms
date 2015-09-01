@@ -1,5 +1,9 @@
 #include <stdlib.h>                     /* Used for malloc definition */
 #include <stdio.h>                                /* Used for fprintf */
+#include "FileIO.h"    /* Definition of file access support functions */
+
+#define NUMPARAMS 2
+#define NUMVAL    4
 
 int id,arrival_time,cpu_burst,priorityn;
 
@@ -1274,10 +1278,72 @@ void DesplegarResultados(float *arreglo)
 int main (int argc, const char * argv[])
 {
     
-
+	FILE   *fp; 
     int    quantum = 4;              /* Quantum value for round robin */
     //int    parameters[NUMVAL];      /* Process parameters in the line */
-    id=4;
+    int    parameters[NUMVAL];      /* Process parameters in the line */
+    int    i;                  /* Number of parameters in the process */
+    
+    /* Check if the number of parameters is correct */
+    if (argc < NUMPARAMS)
+	{  
+        printf("Need a file with the process information\n");
+        printf("Abnormal termination\n");
+        return (EXIT_FAILURE);
+    } 
+	else 
+	{
+        /* Open the file and check that it exists */
+        fp = fopen (argv[1],"r");	  /* Open file for read operation */
+        if (!fp) 
+		{                               /* There is an error */
+            ErrorMsg("main","filename does not exist or is corrupted");
+        } 
+		else
+		{
+            /* The first number in the file is the quantum */
+            quantum = GetInt(fp);
+            
+            if (quantum == EXIT_FAILURE) 
+			{
+                ErrorMsg("main","Quantum not found");
+            } 
+			else 
+			{
+                /*
+                 * Read the process information until the end of file
+                 * is reached.
+                 */
+                while (!feof(fp))
+				{
+                    /* For every four parameters create a new process */
+                    for (i = 0; ((i < NUMVAL) && (!feof(fp))); i++) 
+					{
+                        parameters[i] = GetInt(fp);
+                    }
+                    
+                    /* Do we have four parameters? */
+                    if (i == NUMVAL) 
+					{
+                    	id=parameters[0];
+                    	arrival_time=parameters[1];
+                    	cpu_burst=parameters[2];
+                    	priorityn=parameters[3];
+                    	crearProceso(0);
+                        /*processList_p = CreateProcess(processList_p,
+                                                       parameters[0],
+                                                       parameters[1],
+                                                       parameters[2],
+                                                       parameters[3],
+                                                       NULL);*/
+                    }
+                }
+            }
+        }
+	}
+    
+    
+    /*id=4;
     arrival_time=3;
 	cpu_burst=5;
     priorityn=5;
@@ -1296,7 +1362,7 @@ int main (int argc, const char * argv[])
     arrival_time=1;
 	cpu_burst=4;
     priorityn=3;
-    crearProceso();
+    crearProceso();*/
 
 	OrdenarListas();	
 	consultarProcesos(1,1);
