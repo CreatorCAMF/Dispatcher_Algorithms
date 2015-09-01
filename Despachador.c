@@ -214,7 +214,8 @@ void OrdenarLista()
 //Nota: No lo usa como Input pero se debe tener el metodo consultarProcesos para poder usarlo,
 //esto genera que siempre se despliege la lista original que busca ser ordenada, sin contar que ordena las 3 listas
 //requeridas para hacer todos los tipos de despachadores
-void OrdenarListas(
+void OrdenarListas()
+{
 
 	int i = consultarProcesos(1,1);
 	while(i>0)
@@ -339,46 +340,6 @@ void OrdenarListas(
 		i--;
 	}
 }
-	int i=0;
-		if(primeroGC==NULL)
-		{
-			printf("Lista vacia...\n");
-		}
-		els
-	printf("|===================|\n");
-	printf("|%d   |%d   |%d   |%d   |\n",proceso->id,proceso->arrival_time,proceso->cpu_burst,proceso->priority);
-}
-		{
-			actualGC=primeroGC;
-			while(actualGC!=NULL)
-			{
-				desplegarGantChart(actualGC);					
-				actualGC=actualGC->next
-	printf("%d %d \n",gant->id,gant->proceso);
-}
-				i++;
-			}
-			printf("\n");	
-		}
-
-	int i=0;
-	if(primeroGC==NULL)
-	{
-		printf("Lista vacia...\n");
-	}
-	else
-	{
-		actualGC=primeroGC;
-		while(actualGC!=NULL)
-		{
-			desplegarGantChart(actualGC);					
-			actualGC=actualGC->next;
-			i++;
-		}
-		printf("\n");	
-	}
-}
-{}
 
 //Metodo: desplegarProceso
 //Descripcion: Hace una llamada al sistema para que imprima en pantalla los datos de un nodo de la lista
@@ -1247,6 +1208,7 @@ float RoundRobin(int k, int quantum)
 }
 
 
+
 //Metodo: Desplegar Ratos
 //Descrpción: hace una llamada al sistema operativo para desplegar los datos final al usuario
 //Input: Arreglo con los valores de tiempo que se obtuvieron de los metodos anteriores
@@ -1316,7 +1278,7 @@ int main (int argc, const char * argv[])
     crearProceso();
 
 	OrdenarListas();	
-	consultarProcesos(1,0);
+	consultarProcesos(1,1);
 	float arreglo [6] ={(float)FCFS(),(float)NonPremtiveSJF(consultarProcesos(1,0)),(float)NonPremtivePriority(consultarProcesos(1,0)),(float)PremtiveSJF(consultarProcesos(1,0)),(float)PremtivePriority(consultarProcesos(1,0)),(float)RoundRobin(consultarProcesos(1,0),quantum)};	
 	DesplegarResultados(arreglo);
     printf("Program terminated correclty\n");
