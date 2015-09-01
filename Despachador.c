@@ -345,18 +345,39 @@ void OrdenarListas()
 //Descripcion: Hace una llamada al sistema para que imprima en pantalla los datos de un nodo de la lista
 //Input: struct de tipo processList que se desa imprimir en pantalla
 void desplegarProceso(struct processList *proceso)
-{}
+{
+	printf("|%d   |%d   |%d   |%d   |\n",proceso->id,proceso->arrival_time,proceso->cpu_burst,proceso->priority);
+}
 
 //Metodo: desplegarGantChart
 //Descripcion: Hace una llamada al sistema para que imprima en pantalla los datos de un nodo de la lista GantChart
 //Input: struct de tipo gantChart que se desa imprimir en pantalla
 void desplegarGantChart(struct gantChart *gant)
-{}
+{
+	printf("%d %d \n",gant->id,gant->proceso);
+}
 
 //Metodo: consultarGantChart
 //Descripción: Junto con el metodo desplegarGantChart muestra en pantalla toda la lista de procesos
 void consultarGantChart()
-{}
+{
+	int i=0;
+	if(primeroGC==NULL)
+	{
+		printf("Lista vacia...\n");
+	}
+	else
+	{
+		actualGC=primeroGC;
+		while(actualGC!=NULL)
+		{
+			desplegarGantChart(actualGC);					
+			actualGC=actualGC->next;
+			i++;
+		}
+		printf("\n");	
+	}
+}
 
 //Metodo: consultarProcesos
 //Descripción: Junto con el metodo desplegarProceso muestra en pantalla toda la lista de procesos solicitada
