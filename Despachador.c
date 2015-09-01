@@ -1,7 +1,5 @@
 #include <stdlib.h>                     /* Used for malloc definition */
 #include <stdio.h>                                /* Used for fprintf */
-#include "FileIO.h"    /* Definition of file access support functions */
-
 #define NUMPARAMS 2
 #define NUMVAL    4
 
@@ -10,6 +8,57 @@ int id,arrival_time,cpu_burst,priorityn;
 struct processList *primero=NULL, *ultimo, *actual, *backup, * chestup, *proceso,*a,*b,*x,*p,*primero2,*ultimo2,*actual2,*primero3,*ultimo3,*actual3;
 
 struct gantChart *primeroGC=NULL, *actualGC, *ultimoGC;
+
+
+
+int GetInt (FILE *fp) {
+    int	c,i;	   /* Character read and integer representation of it */
+    int sign = 1;
+    
+    do { 
+        c = getc (fp);                          /* Get next character */
+        if ( c == '#' )	                          /* Skip the comment */
+            do {
+                c = getc (fp);
+            } while ( c != '\n');
+        if ( c == '-')
+            sign = -1;
+    } while (!isdigit(c) && !feof(fp));
+    
+    if (feof(fp)){
+        return (EXIT_FAILURE);
+    } else {
+    /* Found 1st digit, begin conversion until a non-digit is found */
+        i = 0;
+        while (isdigit (c) && !feof(fp)){
+            i = (i*10) + (c - '0');
+            c = getc (fp);
+        }
+        
+        return (i*sign);
+    }
+}
+
+/*
+ *
+ *  Function: ErrorMsg
+ *
+ *  Purpose: Prints an error message and then gracefully terminate the
+ *           program. This is the release version of assert.
+ *
+ *  Parameters:
+ *            input    String with the error message
+ *
+ *            output   Prints the error in standard output and exits
+ *
+ */
+void ErrorMsg (char * function, char *message){
+    
+    printf ("\nError in function %s\n", function);
+    printf ("\t %s\n", message);
+    printf ("The program will terminate.\n\n");
+}
+
 
 //Struct auxiliar usado para crear listas extras de apoyo para los metodos PREEMTIVE y RoundRobin
 //Contiene el id (usado como intervalo de tiempo) y el proceso (id) que se ejecuta en ese intervalo
@@ -697,7 +746,7 @@ float Premtive (int k, int diferencia)
 			cpuburst=inicio-actual->arrival_time;
 		}
 		i++;
-		
+		//printf("CPU burst %d \n",cpuburst);
 		cpuburstTotal+=cpuburst;
 	}
 	primeroGC=NULL;
@@ -735,6 +784,7 @@ float PremtiveSJF(int k)
 		primero2->cpu_burst=cpuburstactual;
 		crearGantChart(contador,primero2->id);	
 	}
+	
 	else
 	{
 		int c=0;
@@ -744,7 +794,8 @@ float PremtiveSJF(int k)
 			crearGantChart(contador,-1);
 		}
 		int d = c;
-	}		
+	}	
+	
 	while(contador<sumaDeCPUBurst+primero2->arrival_time)
 	{
 		actual=primero2;
@@ -760,6 +811,7 @@ float PremtiveSJF(int k)
 		{
 			if(cpuburstactual>actual->cpu_burst)
 			{
+
 				cpuburstactual=actual->cpu_burst;
 				contador++;
 				cpuburstactual--;
@@ -777,10 +829,50 @@ float PremtiveSJF(int k)
 			}
 			else
 			{
+
 				actual=primero2;
 				if(cpuburstactual>0)
 				{
+
 					while(actual!=NULL)
+					{
+						if(actual->cpu_burst==cpuburstactual)
+						{
+							break;
+						}
+						actual=actual->next;
+					}	
+				}
+				else
+				{
+					cpuburstactual = primero2->cpu_burst;
+					while(cpuburstactual==0)
+					{
+						cpuburstactual=actual->cpu_burst;
+						if(actual->next!=NULL)
+						{
+							actual=actual->next;
+						}
+					}
+					int x =0;
+					while(x==0)
+					{
+						if((actual->cpu_burst<cpuburstactual)&&(actual->cpu_burst>0))
+						{
+							cpuburstactual=actual->cpu_burst;		
+						}
+						if(actual->next!=NULL)
+						{
+							actual=actual->next;
+						}
+						else
+						{
+							x=1;
+						}
+					}
+					actual=primero2;
+					x=0;
+					while(x==0)
 					{
 						if(actual->cpu_burst==cpuburstactual)
 						{
@@ -788,18 +880,17 @@ float PremtiveSJF(int k)
 						}
 						else
 						{
-							actual=actual->next;
+							if(actual->next!=NULL)
+							{
+								actual=actual->next;
+							}
+							else
+							{
+								x=1;
+							}
+	
 						}
-					}	
-				}
-				else
-				{
-					int menor = primero2->cpu_burst;
-					while(actual!=NULL)
-					{
-						if((actual->cpu_burst<menor)&&(actual->cpu_burst>0))
-							menor=actual->cpu_burst;
-						actual=actual->next;
+						
 					}
 				}
 				contador++;
@@ -820,19 +911,18 @@ float PremtiveSJF(int k)
 		}
 		else
 		{
+			
 			actual=primero2;
 			if(cpuburstactual>0)
 			{
+				
 				while(actual!=NULL)
 				{
 					if(actual->cpu_burst==cpuburstactual)
 					{
 						break;
 					}
-					else
-					{
-						actual=actual->next;
-					}
+					actual=actual->next;
 				}		
 			}
 			else
@@ -859,7 +949,6 @@ float PremtiveSJF(int k)
 					}
 					else
 					{
-	
 						x=1;
 					}
 				}
@@ -1280,7 +1369,6 @@ int main (int argc, const char * argv[])
     
 	FILE   *fp; 
     int    quantum = 4;              /* Quantum value for round robin */
-    //int    parameters[NUMVAL];      /* Process parameters in the line */
     int    parameters[NUMVAL];      /* Process parameters in the line */
     int    i;                  /* Number of parameters in the process */
     
@@ -1366,13 +1454,18 @@ int main (int argc, const char * argv[])
 
 	OrdenarListas();	
 	consultarProcesos(1,1);
+	
+	//printf("FCFS %f\n",(float)FCFS());
+	//printf("NonPremtiveSJF %f\n",NonPremtiveSJF(consultarProcesos(1,0)));
+	//printf("NonPremtivePriority %f\n",NonPremtivePriority(consultarProcesos(1,0)));
+	//PremtiveSJF(consultarProcesos(1,0));
+	//printf("PremtiveSJF %f\n",PremtiveSJF(consultarProcesos(1,0)));
+	//printf("PremtivePriority %f\n",PremtivePriority(consultarProcesos(1,0)));
+	//printf("RoundRobin %f\n",RoundRobin(consultarProcesos(1,0),quantum));
+	
 	float arreglo [6] ={(float)FCFS(),(float)NonPremtiveSJF(consultarProcesos(1,0)),(float)NonPremtivePriority(consultarProcesos(1,0)),(float)PremtiveSJF(consultarProcesos(1,0)),(float)PremtivePriority(consultarProcesos(1,0)),(float)RoundRobin(consultarProcesos(1,0),quantum)};	
 	DesplegarResultados(arreglo);
     printf("Program terminated correclty\n");
     return (EXIT_SUCCESS);
 }
-
-										   
-
-		
 
